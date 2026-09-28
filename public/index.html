@@ -2,13 +2,19 @@
 <html lang="ku">
 
 <head>
+
 <meta name="google-site-verification" content="VPkGdjylhkUqsDOPwJ9cjAKmLuiDyclPioRVpLMWw7s" />
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>MALIK APPS</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box
+}
 
 body{
   margin:0;
@@ -24,7 +30,10 @@ header{
   border-bottom:2px solid #ff2d75
 }
 
-h1{margin:0;color:#ff2d75}
+h1{
+  margin:0;
+  color:#ff2d75
+}
 
 .container{
   max-width:1100px;
@@ -32,38 +41,38 @@ h1{margin:0;color:#ff2d75}
   padding:24px
 }
 
-.panel,.card{
+.apps{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:18px
+}
+
+.card{
   background:#181818;
   padding:18px;
   border-radius:15px;
   margin-bottom:20px
 }
 
-input,textarea,button{
+.icon{
   width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:0;
-  border-radius:8px
+  height:180px;
+  object-fit:cover;
+  border-radius:10px
 }
 
-input,textarea{
+.small{
+  color:#aaa
+}
+
+.badge{
+  display:inline-block;
   background:#292929;
-  color:#fff
-}
-
-textarea{min-height:90px}
-
-button{
-  background:#ff2d75;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer
-}
-
-button:disabled{
-  opacity:.6;
-  cursor:not-allowed
+  padding:5px 8px;
+  border-radius:15px;
+  color:#ff7da9;
+  font-size:12px;
+  margin-right:5px
 }
 
 .download{
@@ -78,100 +87,21 @@ button:disabled{
   font-weight:bold
 }
 
-.apps{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-  gap:18px
-}
-
-.icon{
-  width:100%;
-  height:180px;
-  object-fit:cover;
-  border-radius:10px
-}
-
-.small{color:#aaa}
-
-.badge{
-  display:inline-block;
-  background:#292929;
-  padding:5px 8px;
-  border-radius:15px;
-  color:#ff7da9;
-  font-size:12px
-}
-
-.file-box{
-  margin-top:10px;
-  padding:14px;
-  background:#292929;
-  border-radius:10px
-}
-
-.file-name{
-  margin-top:8px;
-  color:#ff7da9;
-  word-break:break-all
-}
-
-#msg{
-  margin-top:15px;
-  min-height:20px
-}
 </style>
+
 </head>
 
 <body>
 
 <header>
+
 <h1>📱 MALIK APPS</h1>
+
 <p>APK و IPA ـەکان</p>
+
 </header>
 
 <main class="container">
-
-<section class="panel">
-
-<h2>🔐 Admin Upload</h2>
-
-<input id="name" type="text" placeholder="ناوی ئەپ">
-
-<input id="version" type="text" placeholder="Version">
-
-<textarea id="description" placeholder="دەربارەی ئەپەکە"></textarea>
-
-<label>📦 APK یان IPA:</label>
-
-<div class="file-box">
-
-<input
- id="appFile"
- type="file"
- accept=".apk,.ipa,application/vnd.android.package-archive,application/octet-stream"
->
-
-<div id="appFileName" class="file-name">
-هیچ فایلێک هەڵنەبژێردراوە
-</div>
-
-</div>
-
-<label>🖼️ Icon:</label>
-
-<input id="icon" type="file" accept="image/*">
-
-<input id="password" type="password" placeholder="Admin password">
-
-<button id="uploadButton" onclick="uploadApp()">
-📤 Upload Application
-</button>
-
-<p id="msg" class="small">
-Password ـی demo: 1234
-</p>
-
-</section>
 
 <h2>📱 Applications</h2>
 
@@ -182,11 +112,13 @@ Password ـی demo: 1234
 <script>
 
 const esc=x=>String(x||'').replace(/[&<>"']/g,m=>({
+
 '&':'&amp;',
 '<':'&lt;',
 '>':'&gt;',
 '"':'&quot;',
 "'":'&#039;'
+
 }[m]));
 
 async function load(){
@@ -195,49 +127,82 @@ try{
 
 const response=await fetch('/api/apps');
 
-if(!response.ok)throw new Error('Failed');
+if(!response.ok)
+throw new Error('Failed');
 
 const apps=await response.json();
 
 const container=document.getElementById('apps');
 
 if(!apps.length){
-container.innerHTML='<p class="small">هێشتا هیچ ئەپێک upload نەکراوە.</p>';
+
+container.innerHTML=
+'<p class="small">هێشتا هیچ ئەپێک upload نەکراوە.</p>';
+
 return;
+
 }
 
 container.innerHTML=apps.map(x=>{
 
 const image=x.iconFileName
+
 ?'/uploads/'+encodeURIComponent(x.iconFileName)
+
 :'data:image/svg+xml;charset=UTF-8,'+
 encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" width="500" height="300">
+
 <rect width="100%" height="100%" fill="#252525"/>
-<text x="50%" y="50%" fill="white" font-size="38" text-anchor="middle">
+
+<text
+x="50%"
+y="50%"
+fill="white"
+font-size="38"
+text-anchor="middle">
+
 MALIK APPS
+
 </text>
-</svg>`);
+
+</svg>
+`);
 
 return `
+
 <article class="card">
 
-<img class="icon" src="${image}" alt="">
+<img
+class="icon"
+src="${image}"
+alt="">
 
 <h3>${esc(x.name)}</h3>
 
-<span class="badge">${esc(x.type)}</span>
-<span class="badge">v${esc(x.version)}</span>
+<span class="badge">
+${esc(x.type)}
+</span>
 
-<p class="small">${esc(x.description)}</p>
+<span class="badge">
+v${esc(x.version)}
+</span>
 
-<a class="download"
+<p class="small">
+${esc(x.description)}
+</p>
+
+<a
+class="download"
 href="${x.downloadUrl}"
 download>
+
 ⬇️ Download
+
 </a>
 
 </article>
+
 `;
 
 }).join('');
@@ -245,106 +210,10 @@ download>
 }catch(error){
 
 document.getElementById('apps').innerHTML=
+
 '<p class="small">❌ کێشەیەک لە بارکردنی ئەپەکان هەیە.</p>';
 
 console.error(error);
-
-}
-
-}
-
-document.getElementById('appFile').addEventListener('change',function(){
-
-const file=this.files[0];
-const nameBox=document.getElementById('appFileName');
-
-if(!file){
-nameBox.textContent='هیچ فایلێک هەڵنەبژێردراوە';
-return;
-}
-
-nameBox.textContent='📦 '+file.name;
-
-});
-
-async function uploadApp(){
-
-const file=document.getElementById('appFile').files[0];
-const message=document.getElementById('msg');
-const button=document.getElementById('uploadButton');
-
-if(!file){
-message.textContent='❌ تکایە APK یان IPA هەڵبژێرە.';
-return;
-}
-
-const fileName=file.name.toLowerCase();
-
-if(!fileName.endsWith('.apk')&&!fileName.endsWith('.ipa')){
-message.textContent='❌ تەنها APK و IPA ڕێگەپێدراون.';
-return;
-}
-
-const password=document.getElementById('password').value;
-
-if(!password){
-message.textContent='❌ تکایە Admin password بنووسە.';
-return;
-}
-
-const data=new FormData();
-
-data.append('name',document.getElementById('name').value);
-data.append('version',document.getElementById('version').value);
-data.append('description',document.getElementById('description').value);
-data.append('password',password);
-data.append('appFile',file);
-
-const icon=document.getElementById('icon').files[0];
-
-if(icon)data.append('icon',icon);
-
-button.disabled=true;
-button.textContent='⏳ Uploading...';
-message.textContent='⏳ تکایە چاوەڕێ بکە...';
-
-try{
-
-const response=await fetch('/api/apps',{
-method:'POST',
-body:data
-});
-
-const result=await response.json();
-
-if(!response.ok){
-message.textContent='❌ '+(result.error||'Upload failed.');
-return;
-}
-
-message.textContent='✅ Upload سەرکەوتوو بوو.';
-
-document.getElementById('name').value='';
-document.getElementById('version').value='';
-document.getElementById('description').value='';
-document.getElementById('password').value='';
-document.getElementById('appFile').value='';
-document.getElementById('icon').value='';
-
-document.getElementById('appFileName').textContent=
-'هیچ فایلێک هەڵنەبژێردراوە';
-
-await load();
-
-}catch(error){
-
-message.textContent='❌ کێشەی پەیوەندی بە server هەیە.';
-console.error(error);
-
-}finally{
-
-button.disabled=false;
-button.textContent='📤 Upload Application';
 
 }
 
@@ -355,4 +224,5 @@ load();
 </script>
 
 </body>
+
 </html>
