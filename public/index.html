@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="ku">
+
 <head>
+<meta name="google-site-verification" content="VPkGdjylhkUqsDOPwJ9cjAKmLuiDyclPioRVpLMWw7s" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MALIK APPS</title>
@@ -22,10 +24,7 @@ header{
   border-bottom:2px solid #ff2d75
 }
 
-h1{
-  margin:0;
-  color:#ff2d75
-}
+h1{margin:0;color:#ff2d75}
 
 .container{
   max-width:1100px;
@@ -53,9 +52,7 @@ input,textarea{
   color:#fff
 }
 
-textarea{
-  min-height:90px
-}
+textarea{min-height:90px}
 
 button{
   background:#ff2d75;
@@ -94,9 +91,7 @@ button:disabled{
   border-radius:10px
 }
 
-.small{
-  color:#aaa
-}
+.small{color:#aaa}
 
 .badge{
   display:inline-block;
@@ -130,8 +125,8 @@ button:disabled{
 <body>
 
 <header>
-  <h1>📱 MALIK APPS</h1>
-  <p>APK و IPA ـەکان</p>
+<h1>📱 MALIK APPS</h1>
+<p>APK و IPA ـەکان</p>
 </header>
 
 <main class="container">
@@ -140,59 +135,40 @@ button:disabled{
 
 <h2>🔐 Admin Upload</h2>
 
-<input
-  id="name"
-  type="text"
-  placeholder="ناوی ئەپ"
->
+<input id="name" type="text" placeholder="ناوی ئەپ">
 
-<input
-  id="version"
-  type="text"
-  placeholder="Version"
->
+<input id="version" type="text" placeholder="Version">
 
-<textarea
-  id="description"
-  placeholder="دەربارەی ئەپەکە"
-></textarea>
+<textarea id="description" placeholder="دەربارەی ئەپەکە"></textarea>
 
 <label>📦 APK یان IPA:</label>
 
 <div class="file-box">
 
 <input
-  id="appFile"
-  type="file"
-  accept=".apk,.ipa,application/vnd.android.package-archive,application/octet-stream"
+ id="appFile"
+ type="file"
+ accept=".apk,.ipa,application/vnd.android.package-archive,application/octet-stream"
 >
 
 <div id="appFileName" class="file-name">
-  هیچ فایلێک هەڵنەبژێردراوە
+هیچ فایلێک هەڵنەبژێردراوە
 </div>
 
 </div>
 
 <label>🖼️ Icon:</label>
 
-<input
-  id="icon"
-  type="file"
-  accept="image/*"
->
+<input id="icon" type="file" accept="image/*">
 
-<input
-  id="password"
-  type="password"
-  placeholder="Admin password"
->
+<input id="password" type="password" placeholder="Admin password">
 
 <button id="uploadButton" onclick="uploadApp()">
-  📤 Upload Application
+📤 Upload Application
 </button>
 
 <p id="msg" class="small">
-  Password ـی demo: 1234
+Password ـی demo: 1234
 </p>
 
 </section>
@@ -205,333 +181,174 @@ button:disabled{
 
 <script>
 
-const esc = x =>
-  String(x || '').replace(/[&<>"']/g, m => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#039;'
-  }[m]));
-
-
-/* =========================
-   LOAD APPLICATIONS
-========================= */
+const esc=x=>String(x||'').replace(/[&<>"']/g,m=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#039;'
+}[m]));
 
 async function load(){
 
-  try{
+try{
 
-    const response = await fetch('/api/apps');
+const response=await fetch('/api/apps');
 
-    if(!response.ok){
-      throw new Error('Failed to load applications');
-    }
+if(!response.ok)throw new Error('Failed');
 
-    const apps = await response.json();
+const apps=await response.json();
 
-    const container = document.getElementById('apps');
+const container=document.getElementById('apps');
 
-    if(!apps.length){
+if(!apps.length){
+container.innerHTML='<p class="small">هێشتا هیچ ئەپێک upload نەکراوە.</p>';
+return;
+}
 
-      container.innerHTML =
-        '<p class="small">هێشتا هیچ ئەپێک upload نەکراوە.</p>';
+container.innerHTML=apps.map(x=>{
 
-      return;
-    }
+const image=x.iconFileName
+?'/uploads/'+encodeURIComponent(x.iconFileName)
+:'data:image/svg+xml;charset=UTF-8,'+
+encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300">
+<rect width="100%" height="100%" fill="#252525"/>
+<text x="50%" y="50%" fill="white" font-size="38" text-anchor="middle">
+MALIK APPS
+</text>
+</svg>`);
 
-    container.innerHTML = apps.map(x => {
+return `
+<article class="card">
 
-      const image =
-        x.iconFileName
-        ? '/uploads/' + encodeURIComponent(x.iconFileName)
-        : 'data:image/svg+xml;charset=UTF-8,' +
-          encodeURIComponent(`
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="500"
-                 height="300">
-              <rect width="100%"
-                    height="100%"
-                    fill="#252525"/>
-              <text x="50%"
-                    y="50%"
-                    fill="white"
-                    font-size="38"
-                    text-anchor="middle">
-                MALIK APPS
-              </text>
-            </svg>
-          `);
+<img class="icon" src="${image}" alt="">
 
-      return `
-        <article class="card">
+<h3>${esc(x.name)}</h3>
 
-          <img
-            class="icon"
-            src="${image}"
-            alt=""
-          >
+<span class="badge">${esc(x.type)}</span>
+<span class="badge">v${esc(x.version)}</span>
 
-          <h3>${esc(x.name)}</h3>
+<p class="small">${esc(x.description)}</p>
 
-          <span class="badge">
-            ${esc(x.type)}
-          </span>
+<a class="download"
+href="${x.downloadUrl}"
+download>
+⬇️ Download
+</a>
 
-          <span class="badge">
-            v${esc(x.version)}
-          </span>
+</article>
+`;
 
-          <p class="small">
-            ${esc(x.description)}
-          </p>
+}).join('');
 
-          <a
-            class="download"
-            href="${x.downloadUrl}"
-            download
-          >
-            ⬇️ Download
-          </a>
+}catch(error){
 
-        </article>
-      `;
+document.getElementById('apps').innerHTML=
+'<p class="small">❌ کێشەیەک لە بارکردنی ئەپەکان هەیە.</p>';
 
-    }).join('');
-
-  }catch(error){
-
-    document.getElementById('apps').innerHTML =
-      '<p class="small">❌ کێشەیەک لە بارکردنی ئەپەکان هەیە.</p>';
-
-    console.error(error);
-
-  }
+console.error(error);
 
 }
 
+}
 
-/* =========================
-   SHOW SELECTED FILE
-========================= */
+document.getElementById('appFile').addEventListener('change',function(){
 
-document
-  .getElementById('appFile')
-  .addEventListener('change', function(){
+const file=this.files[0];
+const nameBox=document.getElementById('appFileName');
 
-    const file = this.files[0];
+if(!file){
+nameBox.textContent='هیچ فایلێک هەڵنەبژێردراوە';
+return;
+}
 
-    const nameBox =
-      document.getElementById('appFileName');
+nameBox.textContent='📦 '+file.name;
 
-    if(!file){
-
-      nameBox.textContent =
-        'هیچ فایلێک هەڵنەبژێردراوە';
-
-      return;
-    }
-
-    nameBox.textContent =
-      '📦 ' + file.name;
-
-  });
-
-
-/* =========================
-   UPLOAD APPLICATION
-========================= */
+});
 
 async function uploadApp(){
 
-  const file =
-    document.getElementById('appFile').files[0];
+const file=document.getElementById('appFile').files[0];
+const message=document.getElementById('msg');
+const button=document.getElementById('uploadButton');
 
-  const message =
-    document.getElementById('msg');
+if(!file){
+message.textContent='❌ تکایە APK یان IPA هەڵبژێرە.';
+return;
+}
 
-  const button =
-    document.getElementById('uploadButton');
+const fileName=file.name.toLowerCase();
 
+if(!fileName.endsWith('.apk')&&!fileName.endsWith('.ipa')){
+message.textContent='❌ تەنها APK و IPA ڕێگەپێدراون.';
+return;
+}
 
-  /* Check file */
+const password=document.getElementById('password').value;
 
-  if(!file){
+if(!password){
+message.textContent='❌ تکایە Admin password بنووسە.';
+return;
+}
 
-    message.textContent =
-      '❌ تکایە APK یان IPA هەڵبژێرە.';
+const data=new FormData();
 
-    return;
-  }
+data.append('name',document.getElementById('name').value);
+data.append('version',document.getElementById('version').value);
+data.append('description',document.getElementById('description').value);
+data.append('password',password);
+data.append('appFile',file);
 
+const icon=document.getElementById('icon').files[0];
 
-  /* Check extension */
+if(icon)data.append('icon',icon);
 
-  const fileName =
-    file.name.toLowerCase();
+button.disabled=true;
+button.textContent='⏳ Uploading...';
+message.textContent='⏳ تکایە چاوەڕێ بکە...';
 
-  const isAPK =
-    fileName.endsWith('.apk');
+try{
 
-  const isIPA =
-    fileName.endsWith('.ipa');
+const response=await fetch('/api/apps',{
+method:'POST',
+body:data
+});
 
-  if(!isAPK && !isIPA){
+const result=await response.json();
 
-    message.textContent =
-      '❌ تەنها فایلەکانی APK و IPA ڕێگەپێدراون.';
+if(!response.ok){
+message.textContent='❌ '+(result.error||'Upload failed.');
+return;
+}
 
-    return;
-  }
+message.textContent='✅ Upload سەرکەوتوو بوو.';
 
+document.getElementById('name').value='';
+document.getElementById('version').value='';
+document.getElementById('description').value='';
+document.getElementById('password').value='';
+document.getElementById('appFile').value='';
+document.getElementById('icon').value='';
 
-  /* Check password */
+document.getElementById('appFileName').textContent=
+'هیچ فایلێک هەڵنەبژێردراوە';
 
-  const password =
-    document.getElementById('password').value;
+await load();
 
-  if(!password){
+}catch(error){
 
-    message.textContent =
-      '❌ تکایە Admin password بنووسە.';
+message.textContent='❌ کێشەی پەیوەندی بە server هەیە.';
+console.error(error);
 
-    return;
-  }
+}finally{
 
-
-  /* Create FormData */
-
-  const data = new FormData();
-
-  data.append(
-    'name',
-    document.getElementById('name').value
-  );
-
-  data.append(
-    'version',
-    document.getElementById('version').value
-  );
-
-  data.append(
-    'description',
-    document.getElementById('description').value
-  );
-
-  data.append(
-    'password',
-    password
-  );
-
-  data.append(
-    'appFile',
-    file
-  );
-
-
-  /* Icon */
-
-  const icon =
-    document.getElementById('icon').files[0];
-
-  if(icon){
-
-    data.append(
-      'icon',
-      icon
-    );
-
-  }
-
-
-  /* Upload */
-
-  button.disabled = true;
-
-  button.textContent =
-    '⏳ Uploading...';
-
-  message.textContent =
-    '⏳ تکایە چاوەڕێ بکە...';
-
-
-  try{
-
-    const response = await fetch(
-      '/api/apps',
-      {
-        method:'POST',
-        body:data
-      }
-    );
-
-
-    const result =
-      await response.json();
-
-
-    if(!response.ok){
-
-      message.textContent =
-        '❌ ' +
-        (result.error || 'Upload failed.');
-
-      return;
-    }
-
-
-    /* Success */
-
-    message.textContent =
-      '✅ Upload سەرکەوتوو بوو.';
-
-
-    /* Clear fields */
-
-    document.getElementById('name').value = '';
-
-    document.getElementById('version').value = '';
-
-    document.getElementById('description').value = '';
-
-    document.getElementById('password').value = '';
-
-    document.getElementById('appFile').value = '';
-
-    document.getElementById('icon').value = '';
-
-    document.getElementById('appFileName').textContent =
-      'هیچ فایلێک هەڵنەبژێردراوە';
-
-
-    /* Reload apps */
-
-    await load();
-
-
-  }catch(error){
-
-    console.error(error);
-
-    message.textContent =
-      '❌ کێشەی پەیوەندی بە server هەیە.';
-
-  }finally{
-
-    button.disabled = false;
-
-    button.textContent =
-      '📤 Upload Application';
-
-  }
+button.disabled=false;
+button.textContent='📤 Upload Application';
 
 }
 
-
-/* =========================
-   START
-========================= */
+}
 
 load();
 
